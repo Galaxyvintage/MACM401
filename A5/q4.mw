@@ -4,7 +4,7 @@
 <Label-Scheme value="2" prefix=""/>
 <View-Properties presentation="false" autoexpanding_sections="true" UserProfileName="Maple Default Profile" NumericFormat-ApplyInteger="true" NumericFormat-ApplyRational="true" NumericFormat-ApplyExponent="false" editable="true">
 </View-Properties>
-<MapleNet-Properties prettyprint="3" warnlevel="3" preplot="" helpbrowser="standard" displayprecision="-1" echo="1" unitattributes="&quot;fontweight&quot; = &quot;bold&quot;" imaginaryunit="I" longdelim="true" elisiontermsthreshold="10000" elisiondigitsafter="100" elisiondigitsbefore="100" plotdevice="inline" errorbreak="1" plotoptions="" plotdriver="opengl" quiet="false" elisiontermsbefore="100" elisiontermsafter="100" screenwidth="79" indentamount="4" plotoutput="terminal" screenpixelheight="800" rtablesize="10" useclientjvm="true" labelwidth="20" postplot="" typesetting="extended" ansi="false" ansicolor="[]" elisiondigitsthreshold="10000" showassumed="1" ansilprint="false" errorcursor="false" labelling="true" screenheight="25" prompt="&gt; " verboseproc="1" latexwidth="8.0" ShowLabels="true"/>
+<MapleNet-Properties prettyprint="3" warnlevel="3" preplot="" helpbrowser="standard" displayprecision="-1" echo="1" unitattributes="&quot;fontweight&quot; = &quot;bold&quot;" imaginaryunit="I" longdelim="true" elisiontermsthreshold="10000" elisiondigitsafter="100" elisiondigitsbefore="100" plotdevice="inline" errorbreak="1" plotoptions="" plotdriver="opengl" quiet="false" elisiontermsbefore="100" elisiontermsafter="100" screenwidth="79" indentamount="4" plotoutput="terminal" screenpixelheight="2160" rtablesize="10" useclientjvm="true" labelwidth="20" postplot="" typesetting="extended" ansi="false" ansicolor="[]" elisiondigitsthreshold="10000" showassumed="1" ansilprint="false" errorcursor="false" labelling="true" screenheight="25" prompt="&gt; " verboseproc="1" latexwidth="8.0" ShowLabels="true"/>
 <Styles>
 <Font name="Heading 1" background="[255,255,255]" bold="true" executable="false" family="Times New Roman" foreground="[0,0,0]" italic="false" opaque="false" readonly="false" size="18" subscript="false" superscript="false" underline="false" placeholder="false"/>
 <Font name="Warning" background="[255,255,255]" bold="false" executable="false" family="Courier New" foreground="[0,0,255]" italic="false" opaque="false" readonly="true" size="12" subscript="false" superscript="false" underline="false" placeholder="false"/>
@@ -88,38 +88,121 @@
     <Task-category name="&lt;default&gt;"/>
 </Task-table>
 <Task/>
-<Group hide-input="false" labelreference="L2" drawlabel="true" applyint="true" applyrational="true" applyexponent="false">
-<Input><Text-field prompt="&gt; " style="Maple Input" layout="Normal">op(2);whattype(x^2);</Text-field>
-</Input>
-<Output><Text-field style="2D Output" layout="Maple Output"><Equation executable="false" style="2D Output" display="LUkjbW5HNiMvSSttb2R1bGVuYW1lRzYiSSxUeXBlc2V0dGluZ0dJKF9zeXNsaWJHRic2JFEiMkYnLyUsbWF0aHZhcmlhbnRHUSdub3JtYWxGJw==">IiIj</Equation></Text-field>
-</Output>
-<Output><Text-field style="2D Output" layout="Maple Output"><Equation executable="false" style="2D Output" display="LUkjbWlHNiMvSSttb2R1bGVuYW1lRzYiSSxUeXBlc2V0dGluZ0dJKF9zeXNsaWJHRic2JVEkYF5gRicvJSdpdGFsaWNHUSV0cnVlRicvJSxtYXRodmFyaWFudEdRJ2l0YWxpY0Yn">SSJeRyUqcHJvdGVjdGVkRw==</Equation></Text-field>
-</Output>
-</Group>
 <Group hide-input="false" labelreference="L1" drawlabel="true" applyint="true" applyrational="true" applyexponent="false">
-<Input><Text-field prompt="&gt; " style="Maple Input" layout="Normal">INT := proc(f::algebraic, x::name) local c, u, v, n;    if diff(f,x) = 0 then        f*x;    elif type(f, name) then        if f=x then             1/2 * x^2;       else             f*x;       fi;    elif type(op(1, f), numeric) and op(0, f) = `*` then        c := op(1, f);        c * INT(f/c, x);    elif op(0, f) = `+` then         INT(op(1,f), x) + INT(op(2,f), x);    elif op(0, f) = `^` and op(1, f) = x and diff(op(2,f), x) = 0 then        c := op(2,f);        if c = -1 then             ln(op(1,f));        else            1/(c+1)*x^(c+1);        fi;    elif op(0, f) = exp then         u := op(1,f);        if u = x then            return exp(x);        elif type(op(1,u), numeric) then            return exp(x)*(1/op(1, u));        fi;    elif op(0, f) = ln and diff(op(1,f), x) &lt;&gt; 0 then        u := op(1,f);        c := lcoeff(u);        (1/c)*op(1,f)*(ln(op(1,f)) - 1);    elif op(0, f) = `*` then         u := op(1, f);        if u = x then 
-           v := op(2,f);           if v = exp(x) then 
-                u*v - v;
-           fi;        elif op(0, u) = `^` and op(1, u) = x then            n := op(2, u);           v := op(2,f);           if op(0, v) = exp then                u*v - n * INT(x^(n-1)*v, x);           fi;        fi;             else 'INT'(f, x);    fi; end:</Text-field>
+<Input><Text-field prompt="&gt; " style="Maple Input" layout="Normal">INT := proc(f::algebraic, x::name) local c, u, v, n, i;
+    if diff(f,x) = 0 then 
+       return f*x;
+    elif type(f, name) then 
+       if f=x then 
+            return (1/2)*x^2;
+       else 
+            return f*x;
+       fi;
+    elif op(0, f) = `*` then 
+        c := 1;
+        for i from 1 to nops(f) do
+            if diff(op(i,f), x) &lt;&gt; 0 then
+                u := op(i, f);
+                v := subsop(i=1, f);
+                break;
+            fi 
+        od;
+
+        for i from 1 to nops(v) do
+            if type(op(i,v), numeric)then
+                c:= op(i, v);
+                v := subsop(i=1, v);
+                break;
+            fi 
+        od;
+
+        if u = x and v = exp(x) then 
+             return c*(u*v - v)
+        elif op(0, u) = `^` and v = exp(x) then 
+            n := op(2, u);
+            v := op(2,f);
+            return c*(u*v - n * INT(x^(n-1)*v, x));
+        elif op(0, u) = `^` and op(0, v) = ln then 
+            return c*(INT(u, x)*v -  INT(INT(u, x)*diff(v, x), x));
+        else
+            return c* v * INT(u, x);
+        fi;
+
+    elif op(0, f) = `+` then 
+        return INT(op(1,f), x) + INT(f-op(1,f), x);
+
+    elif op(0, f) = `^` and op(1, f) = x and diff(op(2,f), x) = 0 then
+        c := op(2,f);
+        if c = -1 then 
+            return ln(op(1,f));
+        else
+            return 1/(c+1)*x^(c+1);
+        fi;
+
+    elif op(0, f) = exp then 
+        u := op(1,f);
+        if u = x then
+            return exp(x);
+        elif type(op(1,u), numeric) then
+            return exp(x)*(1/op(1, u));
+        fi;
+
+    elif op(0, f) = ln and diff(op(1,f), x) &lt;&gt; 0 then
+        u := op(1,f);
+        c := lcoeff(u);
+        return (1/c)*op(1,f)*(ln(op(1,f)) - 1);
+    else return 'INT'(f, x);
+    fi; 
+end:</Text-field>
 </Input>
 <Input><Text-field prompt="&gt; " style="Maple Input" spaceabove="0" linebreak="space" rightmargin="0" linespacing="0.0" initial="0" firstindent="0" leftmargin="0" bulletsuffix="" alignment="left" bullet="none" spacebelow="0" pagebreak-before="false"></Text-field>
 </Input>
-<Input><Text-field prompt="&gt; " style="Maple Input" spaceabove="0" linebreak="space" rightmargin="0" linespacing="0.0" initial="0" firstindent="0" leftmargin="0" bulletsuffix="" alignment="left" bullet="none" spacebelow="0" pagebreak-before="false">INT(x^5*exp(x), x);</Text-field>
+<Input><Text-field prompt="&gt; " style="Maple Input" spaceabove="0" linebreak="space" rightmargin="0" linespacing="0.0" initial="0" firstindent="0" leftmargin="0" bulletsuffix="" alignment="left" bullet="none" spacebelow="0" pagebreak-before="false">INT( x^2 + 2*x + 1, x );</Text-field>
 </Input>
-<Output><Text-field style="2D Output" layout="Maple Output"><Equation executable="false" style="2D Output" display="LUklbXJvd0c2Iy9JK21vZHVsZW5hbWVHNiJJLFR5cGVzZXR0aW5nR0koX3N5c2xpYkdGJzYuLUYjNiYtSSVtc3VwR0YkNiUtSSNtaUdGJDYlUSJ4RicvJSdpdGFsaWNHUSV0cnVlRicvJSxtYXRodmFyaWFudEdRJ2l0YWxpY0YnLUkjbW5HRiQ2JFEiNUYnL0Y4USdub3JtYWxGJy8lMXN1cGVyc2NyaXB0c2hpZnRHUSIwRictSSNtb0dGJDYtUTEmSW52aXNpYmxlVGltZXM7RidGPi8lJmZlbmNlR1EmZmFsc2VGJy8lKnNlcGFyYXRvckdGSS8lKXN0cmV0Y2h5R0ZJLyUqc3ltbWV0cmljR0ZJLyUobGFyZ2VvcEdGSS8lLm1vdmFibGVsaW1pdHNHRkkvJSdhY2NlbnRHRkkvJSdsc3BhY2VHUSYwLjBlbUYnLyUncnNwYWNlR0ZYLUYuNiUtRkQ2LVEvJkV4cG9uZW50aWFsRTtGJ0Y+RkdGSkZMRk5GUEZSRlRGVi9GWlEsMC4xMTExMTExZW1GJ0YwRkBGPi1GRDYtUSgmbWludXM7RidGPkZHRkpGTEZORlBGUkZUL0ZXUSwwLjIyMjIyMjJlbUYnL0ZaRmBvLUYjNihGOkZDLUYuNiVGMC1GOzYkUSI0RidGPkZARkNGZW5GPi1GRDYtUScmcGx1cztGJ0Y+RkdGSkZMRk5GUEZSRlRGX29GYW8tRiM2KC1GOzYkUSMyMEYnRj5GQy1GLjYlRjAtRjs2JFEiM0YnRj5GQEZDRmVuRj5GXG8tRiM2KC1GOzYkUSM2MEYnRj5GQy1GLjYlRjAtRjs2JFEiMkYnRj5GQEZDRmVuRj5GaW8tRiM2KC1GOzYkUSQxMjBGJ0Y+RkNGMEZDRmVuRj5GXG8tRiM2JkZicUZDRmVuRj5GPg==">LC4qJkkieEc2IiIiJi1JJGV4cEc2JCUqcHJvdGVjdGVkR0koX3N5c2xpYkdGJTYjRiQiIiJGLSomRiQiIiVGJ0YtISImKiZGJCIiJEYnRi0iIz8qJkYkIiIjRidGLSEjZyomRiRGLUYnRi0iJD8iRichJD8i</Equation></Text-field>
+<Output><Text-field style="2D Output" layout="Maple Output"><Equation executable="false" style="2D Output" display="LUklbXJvd0c2Iy9JK21vZHVsZW5hbWVHNiJJLFR5cGVzZXR0aW5nR0koX3N5c2xpYkdGJzYoLUYjNiYtSSZtZnJhY0dGJDYoLUkjbW5HRiQ2JFEiMUYnLyUsbWF0aHZhcmlhbnRHUSdub3JtYWxGJy1GMTYkUSIzRidGNC8lLmxpbmV0aGlja25lc3NHRjMvJStkZW5vbWFsaWduR1EnY2VudGVyRicvJSludW1hbGlnbkdGPi8lKWJldmVsbGVkR1EmZmFsc2VGJy1JI21vR0YkNi1RMSZJbnZpc2libGVUaW1lcztGJ0Y0LyUmZmVuY2VHRkMvJSpzZXBhcmF0b3JHRkMvJSlzdHJldGNoeUdGQy8lKnN5bW1ldHJpY0dGQy8lKGxhcmdlb3BHRkMvJS5tb3ZhYmxlbGltaXRzR0ZDLyUnYWNjZW50R0ZDLyUnbHNwYWNlR1EmMC4wZW1GJy8lJ3JzcGFjZUdGWC1JJW1zdXBHRiQ2JS1JI21pR0YkNiVRInhGJy8lJ2l0YWxpY0dRJXRydWVGJy9GNVEnaXRhbGljRidGNy8lMXN1cGVyc2NyaXB0c2hpZnRHUSIwRidGNC1GRTYtUScmcGx1cztGJ0Y0RkhGSkZMRk5GUEZSRlQvRldRLDAuMjIyMjIyMmVtRicvRlpGaG8tRmZuNiVGaG4tRjE2JFEiMkYnRjRGYW9GZG9GaG5GNA==">LCgqJiMiIiIiIiRGJSlJInhHNiJGJkYlRiUqJClGKCIiI0YlRiVGKEYl</Equation></Text-field>
 </Output>
 </Group>
 <Group hide-input="false" labelreference="L15" drawlabel="true" applyint="true" applyrational="true" applyexponent="false">
-<Input><Text-field prompt="&gt; " style="Maple Input" layout="Normal">op(2, 5*x^4*exp(x));</Text-field>
+<Input><Text-field prompt="&gt; " style="Maple Input" layout="Normal"> INT( x^(-1) + 2*x^(-2) + 3*x^(-1/2), x );</Text-field>
 </Input>
-<Output><Text-field style="2D Output" layout="Maple Output"><Equation executable="false" style="2D Output" display="LUklbXN1cEc2Iy9JK21vZHVsZW5hbWVHNiJJLFR5cGVzZXR0aW5nR0koX3N5c2xpYkdGJzYlLUkjbWlHRiQ2JVEieEYnLyUnaXRhbGljR1EldHJ1ZUYnLyUsbWF0aHZhcmlhbnRHUSdpdGFsaWNGJy1JI21uR0YkNiRRIjRGJy9GM1Enbm9ybWFsRicvJTFzdXBlcnNjcmlwdHNoaWZ0R1EiMEYn">KiRJInhHNiIiIiU=</Equation></Text-field>
+<Output><Text-field style="2D Output" layout="Maple Output"><Equation executable="false" style="2D Output" display="LUklbXJvd0c2Iy9JK21vZHVsZW5hbWVHNiJJLFR5cGVzZXR0aW5nR0koX3N5c2xpYkdGJzYmLUkmbWZyYWNHRiQ2KC1JI21uR0YkNiRRIjFGJy8lLG1hdGh2YXJpYW50R1Enbm9ybWFsRictSSVtc3VwR0YkNiUtSSNtaUdGJDYlUSJ4RicvJSdpdGFsaWNHUSV0cnVlRicvRjNRJ2l0YWxpY0YnLUYvNiRRIjJGJ0YyLyUxc3VwZXJzY3JpcHRzaGlmdEdRIjBGJy8lLmxpbmV0aGlja25lc3NHRjEvJStkZW5vbWFsaWduR1EnY2VudGVyRicvJSludW1hbGlnbkdGSy8lKWJldmVsbGVkR1EmZmFsc2VGJy1JI21vR0YkNi1RKCZjb21tYTtGJ0YyLyUmZmVuY2VHRlAvJSpzZXBhcmF0b3JHRj4vJSlzdHJldGNoeUdGUC8lKnN5bW1ldHJpY0dGUC8lKGxhcmdlb3BHRlAvJS5tb3ZhYmxlbGltaXRzR0ZQLyUnYWNjZW50R0ZQLyUnbHNwYWNlR1EmMC4wZW1GJy8lJ3JzcGFjZUdRLDAuMzMzMzMzM2VtRidGLkYy">NiQqJClJInhHNiIiIiMhIiIiIiI=</Equation></Text-field>
+</Output>
+<Output><Text-field style="2D Output" layout="Maple Output"><Equation executable="false" style="2D Output" display="LUklbXJvd0c2Iy9JK21vZHVsZW5hbWVHNiJJLFR5cGVzZXR0aW5nR0koX3N5c2xpYkdGJzYmLUkmbWZyYWNHRiQ2KC1JI21uR0YkNiRRIjFGJy8lLG1hdGh2YXJpYW50R1Enbm9ybWFsRictSSZtc3FydEdGJDYjLUkjbWlHRiQ2JVEieEYnLyUnaXRhbGljR1EldHJ1ZUYnL0YzUSdpdGFsaWNGJy8lLmxpbmV0aGlja25lc3NHRjEvJStkZW5vbWFsaWduR1EnY2VudGVyRicvJSludW1hbGlnbkdGRS8lKWJldmVsbGVkR1EmZmFsc2VGJy1JI21vR0YkNi1RKCZjb21tYTtGJ0YyLyUmZmVuY2VHRkovJSpzZXBhcmF0b3JHRj4vJSlzdHJldGNoeUdGSi8lKnN5bW1ldHJpY0dGSi8lKGxhcmdlb3BHRkovJS5tb3ZhYmxlbGltaXRzR0ZKLyUnYWNjZW50R0ZKLyUnbHNwYWNlR1EmMC4wZW1GJy8lJ3JzcGFjZUdRLDAuMzMzMzMzM2VtRidGLkYy">NiQqJClJInhHNiIjIiIiIiIjISIiRig=</Equation></Text-field>
+</Output>
+<Output><Text-field style="2D Output" layout="Maple Output"><Equation executable="false" style="2D Output" display="LUklbXJvd0c2Iy9JK21vZHVsZW5hbWVHNiJJLFR5cGVzZXR0aW5nR0koX3N5c2xpYkdGJzYoLUYjNiYtSSNtaUdGJDYlUSNsbkYnLyUnaXRhbGljR1EmZmFsc2VGJy8lLG1hdGh2YXJpYW50R1Enbm9ybWFsRictSSNtb0dGJDYtUTAmQXBwbHlGdW5jdGlvbjtGJ0Y0LyUmZmVuY2VHRjMvJSpzZXBhcmF0b3JHRjMvJSlzdHJldGNoeUdGMy8lKnN5bW1ldHJpY0dGMy8lKGxhcmdlb3BHRjMvJS5tb3ZhYmxlbGltaXRzR0YzLyUnYWNjZW50R0YzLyUnbHNwYWNlR1EmMC4wZW1GJy8lJ3JzcGFjZUdGSy1JKG1mZW5jZWRHRiQ2JC1GIzYmLUYuNiVRInhGJy9GMlEldHJ1ZUYnL0Y1USdpdGFsaWNGJy8lK2ZvcmVncm91bmRHUShbMCwwLDBdRicvJSlyZWFkb25seUdGM0Y0RjRGNC1GODYtUSgmbWludXM7RidGNEY7Rj1GP0ZBRkNGRUZHL0ZKUSwwLjIyMjIyMjJlbUYnL0ZNRl1vLUkmbWZyYWNHRiQ2KC1JI21uR0YkNiRRIjJGJ0Y0RlMvJS5saW5ldGhpY2tuZXNzR1EiMUYnLyUrZGVub21hbGlnbkdRJ2NlbnRlckYnLyUpbnVtYWxpZ25HRltwLyUpYmV2ZWxsZWRHRjMtRjg2LVEnJnBsdXM7RidGNEY7Rj1GP0ZBRkNGRUZHRlxvRl5vLUYjNiYtRmNvNiRRIjZGJ0Y0LUY4Ni1RMSZJbnZpc2libGVUaW1lcztGJ0Y0RjtGPUY/RkFGQ0ZFRkdGSUZMLUkmbXNxcnRHRiQ2I0ZTRjRGNA==">LCgtSSNsbkc2JCUqcHJvdGVjdGVkR0koX3N5c2xpYkc2IjYjSSJ4R0YoIiIiKiYiIiNGK0YqISIiRi4qJiIiJ0YrKUYqI0YrRi1GK0Yr</Equation></Text-field>
 </Output>
 </Group>
-<Group labelreference="L16" drawlabel="true" applyint="true" applyrational="true" applyexponent="false">
-<Input><Text-field prompt="&gt; " style="Maple Input" layout="Normal"></Text-field>
+<Group hide-input="false" labelreference="L18" drawlabel="true" applyint="true" applyrational="true" applyexponent="false">
+<Input><Text-field prompt="&gt; " style="Maple Input" layout="Normal">INT( exp(x) + ln(x) + sin(x), x );</Text-field>
 </Input>
+<Output><Text-field style="2D Output" layout="Maple Output"><Equation executable="false" style="2D Output" display="LUklbXJvd0c2Iy9JK21vZHVsZW5hbWVHNiJJLFR5cGVzZXR0aW5nR0koX3N5c2xpYkdGJzYoLUklbXN1cEdGJDYlLUkjbW9HRiQ2LVEvJkV4cG9uZW50aWFsRTtGJy8lLG1hdGh2YXJpYW50R1Enbm9ybWFsRicvJSZmZW5jZUdRJmZhbHNlRicvJSpzZXBhcmF0b3JHRjcvJSlzdHJldGNoeUdGNy8lKnN5bW1ldHJpY0dGNy8lKGxhcmdlb3BHRjcvJS5tb3ZhYmxlbGltaXRzR0Y3LyUnYWNjZW50R0Y3LyUnbHNwYWNlR1EmMC4wZW1GJy8lJ3JzcGFjZUdRLDAuMTExMTExMWVtRictSSNtaUdGJDYlUSJ4RicvJSdpdGFsaWNHUSV0cnVlRicvRjNRJ2l0YWxpY0YnLyUxc3VwZXJzY3JpcHRzaGlmdEdRIjBGJy1GLzYtUScmcGx1cztGJ0YyRjVGOEY6RjxGPkZARkIvRkVRLDAuMjIyMjIyMmVtRicvRkhGWi1GIzYmRkotRi82LVExJkludmlzaWJsZVRpbWVzO0YnRjJGNUY4RjpGPEY+RkBGQkZEL0ZIRkYtSShtZmVuY2VkR0YkNiQtRiM2Ji1GIzYmLUZLNiVRI2xuRicvRk9GN0YyLUYvNi1RMCZBcHBseUZ1bmN0aW9uO0YnRjJGNUY4RjpGPEY+RkBGQkZERltvLUZdbzYkLUYjNiZGSi8lK2ZvcmVncm91bmRHUShbMCwwLDBdRicvJSlyZWFkb25seUdGN0YyRjJGMi1GLzYtUSgmbWludXM7RidGMkY1RjhGOkY8Rj5GQEZCRllGZW4tSSNtbkdGJDYkUSIxRidGMkYyRjJGMkZWLUYjNiYtRks2JVEkSU5URidGTkZRRmdvLUZdbzYkLUYjNigtRiM2Ji1GSzYlUSRzaW5GJ0Zmb0YyRmdvRmpvRjItRi82LVEiLEYnRjJGNS9GOUZQRjpGPEY+RkBGQkZEL0ZIUSwwLjMzMzMzMzNlbUYnRkpGXnBGYXBGMkYyRjJGMg==">LCgtSSRleHBHNiQlKnByb3RlY3RlZEdJKF9zeXNsaWJHNiI2I0kieEdGKCIiIiomRipGKywmLUkjbG5HRiVGKUYrRishIiJGK0YrLUkkSU5UR0YoNiQtSSRzaW5HRiVGKUYqRis=</Equation></Text-field>
+</Output>
 </Group>
-<Group labelreference="L17" drawlabel="true" applyint="true" applyrational="true" applyexponent="false">
+<Group hide-input="false" labelreference="L19" drawlabel="true" applyint="true" applyrational="true" applyexponent="false">
+<Input><Text-field prompt="&gt; " style="Maple Input" layout="Normal">INT( 2*f(x) + 3*y*x/2 + 3*ln(2), x );</Text-field>
+</Input>
+<Output><Text-field style="2D Output" layout="Maple Output"><Equation executable="false" style="2D Output" display="LUklbXJvd0c2Iy9JK21vZHVsZW5hbWVHNiJJLFR5cGVzZXR0aW5nR0koX3N5c2xpYkdGJzYoLUYjNiYtSSNtbkdGJDYkUSIyRicvJSxtYXRodmFyaWFudEdRJ25vcm1hbEYnLUkjbW9HRiQ2LVExJkludmlzaWJsZVRpbWVzO0YnRjEvJSZmZW5jZUdRJmZhbHNlRicvJSpzZXBhcmF0b3JHRjovJSlzdHJldGNoeUdGOi8lKnN5bW1ldHJpY0dGOi8lKGxhcmdlb3BHRjovJS5tb3ZhYmxlbGltaXRzR0Y6LyUnYWNjZW50R0Y6LyUnbHNwYWNlR1EmMC4wZW1GJy8lJ3JzcGFjZUdGSS1GIzYmLUkjbWlHRiQ2JVEkSU5URicvJSdpdGFsaWNHUSV0cnVlRicvRjJRJ2l0YWxpY0YnLUY1Ni1RMCZBcHBseUZ1bmN0aW9uO0YnRjFGOEY7Rj1GP0ZBRkNGRUZHRkotSShtZmVuY2VkR0YkNiQtRiM2KC1GIzYmLUZPNiVRImZGJ0ZSRlVGVy1GZW42JC1GIzYmLUZPNiVRInhGJ0ZSRlUvJStmb3JlZ3JvdW5kR1EoWzAsMCwwXUYnLyUpcmVhZG9ubHlHRjpGMUYxRjEtRjU2LVEiLEYnRjFGOC9GPEZURj1GP0ZBRkNGRUZHL0ZLUSwwLjMzMzMzMzNlbUYnRmJvRmVvRmhvRjFGMUYxRjEtRjU2LVEnJnBsdXM7RidGMUY4RjtGPUY/RkFGQ0ZFL0ZIUSwwLjIyMjIyMjJlbUYnL0ZLRmRwLUkmbWZyYWNHRiQ2KC1GIzYoLUYuNiRRIjNGJ0YxRjQtRk82JVEieUYnRlJGVUY0LUklbXN1cEdGJDYlRmJvRi0vJTFzdXBlcnNjcmlwdHNoaWZ0R1EiMEYnRjEtRi42JFEiNEYnRjEvJS5saW5ldGhpY2tuZXNzR1EiMUYnLyUrZGVub21hbGlnbkdRJ2NlbnRlckYnLyUpbnVtYWxpZ25HRl9yLyUpYmV2ZWxsZWRHRjpGYHAtRiM2KEZbcUY0RmJvRjQtRiM2Ji1GTzYlUSNsbkYnL0ZTRjpGMUZXLUZlbjYkLUYjNiZGLUZlb0Zob0YxRjFGMUYxRjE=">LCgqJiIiIyIiIi1JJElOVEc2IjYkLUkiZkdGKDYjSSJ4R0YoRi1GJUYlKigjIiIkIiIlRiVJInlHRihGJSlGLUYkRiVGJSooRjBGJUYtRiUtSSNsbkc2JCUqcHJvdGVjdGVkR0koX3N5c2xpYkdGKDYjRiRGJUYl</Equation></Text-field>
+</Output>
+</Group>
+<Group hide-input="false" labelreference="L26" drawlabel="true" applyint="true" applyrational="true" applyexponent="false">
+<Input><Text-field prompt="&gt; " style="Maple Input" layout="Normal">INT( x^2*exp(x)+ 2*x*exp(x), x );</Text-field>
+</Input>
+<Output><Text-field style="2D Output" layout="Maple Output"><Equation executable="false" style="2D Output" display="LUklbXJvd0c2Iy9JK21vZHVsZW5hbWVHNiJJLFR5cGVzZXR0aW5nR0koX3N5c2xpYkdGJzYmLUklbXN1cEdGJDYlLUkjbWlHRiQ2JVEieEYnLyUnaXRhbGljR1EldHJ1ZUYnLyUsbWF0aHZhcmlhbnRHUSdpdGFsaWNGJy1JI21uR0YkNiRRIjJGJy9GNlEnbm9ybWFsRicvJTFzdXBlcnNjcmlwdHNoaWZ0R1EiMEYnLUkjbW9HRiQ2LVExJkludmlzaWJsZVRpbWVzO0YnRjwvJSZmZW5jZUdRJmZhbHNlRicvJSpzZXBhcmF0b3JHRkcvJSlzdHJldGNoeUdGRy8lKnN5bW1ldHJpY0dGRy8lKGxhcmdlb3BHRkcvJS5tb3ZhYmxlbGltaXRzR0ZHLyUnYWNjZW50R0ZHLyUnbHNwYWNlR1EmMC4wZW1GJy8lJ3JzcGFjZUdGVi1GLDYlLUZCNi1RLyZFeHBvbmVudGlhbEU7RidGPEZFRkhGSkZMRk5GUEZSRlQvRlhRLDAuMTExMTExMWVtRidGLkY+Rjw=">KiYpSSJ4RzYiIiIjIiIiLUkkZXhwRzYkJSpwcm90ZWN0ZWRHSShfc3lzbGliR0YlNiNGJEYn</Equation></Text-field>
+</Output>
+</Group>
+<Group hide-input="false" labelreference="L27" drawlabel="true" applyint="true" applyrational="true" applyexponent="false">
+<Input><Text-field prompt="&gt; " style="Maple Input" layout="Normal">INT( 2*exp(-x) + ln(2*x+1), x );</Text-field>
+</Input>
+<Output><Text-field style="2D Output" layout="Maple Output"><Equation executable="false" style="2D Output" display="LUklbXJvd0c2Iy9JK21vZHVsZW5hbWVHNiJJLFR5cGVzZXR0aW5nR0koX3N5c2xpYkdGJzYnLUkjbW9HRiQ2LVEqJnVtaW51czA7RicvJSxtYXRodmFyaWFudEdRJ25vcm1hbEYnLyUmZmVuY2VHUSZmYWxzZUYnLyUqc2VwYXJhdG9yR0Y0LyUpc3RyZXRjaHlHRjQvJSpzeW1tZXRyaWNHRjQvJShsYXJnZW9wR0Y0LyUubW92YWJsZWxpbWl0c0dGNC8lJ2FjY2VudEdGNC8lJ2xzcGFjZUdRLDAuMjIyMjIyMmVtRicvJSdyc3BhY2VHRkMtRiM2Ji1JI21uR0YkNiRRIjJGJ0YvLUYsNi1RMSZJbnZpc2libGVUaW1lcztGJ0YvRjJGNUY3RjlGO0Y9Rj8vRkJRJjAuMGVtRicvRkVGUC1JJW1zdXBHRiQ2JS1GLDYtUS8mRXhwb25lbnRpYWxFO0YnRi9GMkY1RjdGOUY7Rj1GP0ZPL0ZFUSwwLjExMTExMTFlbUYnLUkjbWlHRiQ2JVEieEYnLyUnaXRhbGljR1EldHJ1ZUYnL0YwUSdpdGFsaWNGJy8lMXN1cGVyc2NyaXB0c2hpZnRHUSIwRidGLy1GLDYtUScmcGx1cztGJ0YvRjJGNUY3RjlGO0Y9Rj9GQUZELUkmbWZyYWNHRiQ2KC1GIzYmLUkobWZlbmNlZEdGJDYkLUYjNiYtRiM2JkZIRkxGWkYvRmBvLUZJNiRRIjFGJ0YvRi9GL0ZMLUZpbzYkLUYjNiYtRiM2Ji1GZW42JVEjbG5GJy9GaW5GNEYvLUYsNi1RMCZBcHBseUZ1bmN0aW9uO0YnRi9GMkY1RjdGOUY7Rj1GP0ZPRlFGaG9GLy1GLDYtUSgmbWludXM7RidGL0YyRjVGN0Y5RjtGPUY/RkFGREZfcEYvRi9GL0ZILyUubGluZXRoaWNrbmVzc0dGYXAvJStkZW5vbWFsaWduR1EnY2VudGVyRicvJSludW1hbGlnbkdGZnEvJSliZXZlbGxlZEdGNEYv">LCYqJiIiIyIiIi1JJGV4cEc2JCUqcHJvdGVjdGVkR0koX3N5c2xpYkc2IjYjSSJ4R0YrRiUhIiIqKCNGJUYkRiUsJiomRiRGJUYtRiVGJUYlRiVGJSwmLUkjbG5HRig2I0YxRiVGJUYuRiVGJQ==</Equation></Text-field>
+</Output>
+</Group>
+<Group hide-input="false" labelreference="L28" drawlabel="true" applyint="true" applyrational="true" applyexponent="false">
+<Input><Text-field prompt="&gt; " style="Maple Input" layout="Normal">INT( 4*x^3*ln(x) + 3*x^2*ln(x), x );</Text-field>
+</Input>
+<Output><Text-field style="2D Output" layout="Maple Output"><Equation executable="false" style="2D Output" display="LUklbXJvd0c2Iy9JK21vZHVsZW5hbWVHNiJJLFR5cGVzZXR0aW5nR0koX3N5c2xpYkdGJzYqLUYjNiYtSSVtc3VwR0YkNiUtSSNtaUdGJDYlUSJ4RicvJSdpdGFsaWNHUSV0cnVlRicvJSxtYXRodmFyaWFudEdRJ2l0YWxpY0YnLUkjbW5HRiQ2JFEiNEYnL0Y4USdub3JtYWxGJy8lMXN1cGVyc2NyaXB0c2hpZnRHUSIwRictSSNtb0dGJDYtUTEmSW52aXNpYmxlVGltZXM7RidGPi8lJmZlbmNlR1EmZmFsc2VGJy8lKnNlcGFyYXRvckdGSS8lKXN0cmV0Y2h5R0ZJLyUqc3ltbWV0cmljR0ZJLyUobGFyZ2VvcEdGSS8lLm1vdmFibGVsaW1pdHNHRkkvJSdhY2NlbnRHRkkvJSdsc3BhY2VHUSYwLjBlbUYnLyUncnNwYWNlR0ZYLUYjNiYtRjE2JVEjbG5GJy9GNUZJRj4tRkQ2LVEwJkFwcGx5RnVuY3Rpb247RidGPkZHRkpGTEZORlBGUkZURlZGWS1JKG1mZW5jZWRHRiQ2JC1GIzYmRjAvJStmb3JlZ3JvdW5kR1EoWzAsMCwwXUYnLyUpcmVhZG9ubHlHRklGPkY+Rj5GPi1GRDYtUSgmbWludXM7RidGPkZHRkpGTEZORlBGUkZUL0ZXUSwwLjIyMjIyMjJlbUYnL0ZaRlxwLUkmbWZyYWNHRiQ2KEYtRjovJS5saW5ldGhpY2tuZXNzR1EiMUYnLyUrZGVub21hbGlnbkdRJ2NlbnRlckYnLyUpbnVtYWxpZ25HRmZwLyUpYmV2ZWxsZWRHRkktRkQ2LVEnJnBsdXM7RidGPkZHRkpGTEZORlBGUkZURltwRl1wLUYjNiYtRi42JUYwLUY7NiRRIjNGJ0Y+RkBGQ0ZlbkY+RmhvLUZfcDYoRmBxRmJxRmFwRmRwRmdwRmlwRj4=">LCoqJilJInhHNiIiIiUiIiItSSNsbkc2JCUqcHJvdGVjdGVkR0koX3N5c2xpYkdGJjYjRiVGKEYoKiYjRihGJ0YoRiRGKCEiIiomKUYlIiIkRihGKUYoRigqJiNGKEY0RihGM0YoRjE=</Equation></Text-field>
+</Output>
+</Group>
+<Group labelreference="L29" drawlabel="true" applyint="true" applyrational="true" applyexponent="false">
 <Input><Text-field prompt="&gt; " style="Maple Input" layout="Normal"></Text-field>
 </Input>
 </Group>
